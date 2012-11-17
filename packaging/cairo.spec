@@ -1,5 +1,6 @@
 %define build_xcb_backend 0
 %define build_gl_backend 1
+%define enable_wayland 1
 
 Name:           cairo
 Version:        1.12.4
@@ -10,10 +11,7 @@ Url:            http://cairographics.org/
 Group:          System/Libraries
 Source:         http://cairographics.org/releases/%{name}-%{version}.tar.xz
 Source99:       baselibs.conf
-# PATCH-FIX-UPSTREAM cairo-modules-no-version.patch fdo#29319 dimstar@opensuse.org -- Build modules with -module -avoid-version.
-Patch0:         cairo-modules-no-version.patch
 BuildRequires:  gtk-doc
-# Needed by patch0
 BuildRequires:  libtool
 BuildRequires:  pkg-config
 BuildRequires:  xz
@@ -29,7 +27,9 @@ BuildRequires:  pkgconfig(xcb-shm)
 %endif
 %if %build_gl_backend
 BuildRequires:  mesa-devel
-#BuildRequires:	pkgconfig(wayland-egl)
+%if enable_wayland
+BuildRequires:	pkgconfig(wayland-egl)
+%endif
 %endif
 BuildRequires:  pkgconfig(xrender)
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
@@ -112,7 +112,6 @@ cairo.
 
 %prep
 %setup -q
-%patch0 -p1
 
 %build
 # Needed by patch0
