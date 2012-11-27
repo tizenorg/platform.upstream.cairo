@@ -21,6 +21,7 @@ BuildRequires:  pkgconfig(gobject-2.0)
 BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(pixman-1)
 BuildRequires:  pkgconfig(x11)
+BuildRequires:  which
 %if %build_xcb_backend
 BuildRequires:  pkgconfig(xcb)
 BuildRequires:  pkgconfig(xcb-shm)
