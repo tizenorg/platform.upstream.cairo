@@ -11,7 +11,6 @@ Url:            http://cairographics.org/
 Group:          System/Libraries
 Source:         http://cairographics.org/releases/%{name}-%{version}.tar.xz
 Source99:       baselibs.conf
-#BuildRequires:  gtk-doc
 BuildRequires:  libtool
 BuildRequires:  pkg-config
 BuildRequires:  xz
