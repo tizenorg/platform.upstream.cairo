@@ -1,6 +1,7 @@
 %define build_xcb_backend 0
 %define build_gl_backend 1
-%define enable_wayland 1
+%bcond_with wayland
+
 
 Name:           cairo
 Version:        1.12.4
@@ -27,7 +28,7 @@ BuildRequires:  pkgconfig(xcb-shm)
 %endif
 %if %build_gl_backend
 BuildRequires:  mesa-devel
-%if enable_wayland
+%if %{with wayland}
 BuildRequires:	pkgconfig(wayland-egl)
 %endif
 %endif
