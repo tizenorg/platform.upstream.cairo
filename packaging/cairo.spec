@@ -9,7 +9,7 @@ Release:        0
 License:        LGPL-2.1+ or MPL-1.1
 Summary:        Vector Graphics Library with Cross-Device Output Support
 Url:            http://cairographics.org/
-Group:          System/Libraries
+Group:          Graphics/Libraries
 Source:         http://cairographics.org/releases/%{name}-%{version}.tar.xz
 Source99:       baselibs.conf
 BuildRequires:  libtool
@@ -45,7 +45,7 @@ hardware acceleration when available.
 %package -n libcairo
 License:        LGPL-2.1+ or MPL-1.1
 Summary:        Vector Graphics Library with Cross-Device Output Support
-Group:          System/Libraries
+Group:          Graphics/Libraries
 Provides:       cairo = %{version}
 Obsoletes:      cairo < %{version}
 
@@ -59,7 +59,7 @@ hardware acceleration when available.
 %package -n libcairo-gobject
 License:        LGPL-2.1+ or MPL-1.1
 Summary:        Vector Graphics Library with Cross-Device Output Support
-Group:          System/Libraries
+Group:          Graphics/Libraries
 
 %description -n libcairo-gobject
 Cairo is a vector graphics library with cross-device output support.
@@ -74,7 +74,7 @@ meant to support gobject-introspection binding creation.
 %package -n libcairo-script-interpreter
 License:        LGPL-2.1+ or MPL-1.1
 Summary:        Vector Graphics Library with Cross-Device Output Support
-Group:          System/Libraries
+Group:          Graphics/Libraries
 
 %description -n libcairo-script-interpreter
 Cairo is a vector graphics library with cross-device output support.
@@ -86,7 +86,7 @@ hardware acceleration when available.
 %package tools
 License:        GPL-3.0+
 Summary:        Vector Graphics Library with Cross-Device Output Support -- Utilities
-Group:          Development/Libraries/X11
+Group:          Development/Libraries
 # We need an explicit requires since nothing links to the cairo library
 Requires:       libcairo = %{version}
 
@@ -102,7 +102,7 @@ This package contains various cairo utilities.
 %package devel
 License:        LGPL-2.1+ or MPL-1.1
 Summary:        Development environment for cairo
-Group:          Development/Libraries/X11
+Group:          Development/Libraries
 Requires:       libcairo = %{version}
 Requires:       libcairo-gobject = %{version}
 Requires:       libcairo-script-interpreter = %{version}
