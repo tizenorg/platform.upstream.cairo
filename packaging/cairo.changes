@@ -1,3 +1,6 @@
+* Mon Feb 11 2013 Anas Nashif <anas.nashif@intel.com> upstream/1.12.14@4d94376
+- Update to 1.12.14
+
 * Tue Dec 11 2012 Anas Nashif <anas.nashif@intel.com> submit/trunk/20121212.015122@32a6f12
 - actually use bcond_without to enable wayland by default
 
