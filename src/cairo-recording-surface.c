@@ -210,7 +210,10 @@ bbtree_add (struct bbtree *bbt,
     if (box->p1.x == bbt->extents.p1.x && box->p1.y == bbt->extents.p1.y &&
 	box->p2.x == bbt->extents.p2.x && box->p2.y == bbt->extents.p2.y)
     {
-	header->chain = bbt->chain;
+	cairo_command_header_t *last = header;
+	while (last->chain) /* expected to be infrequent */
+	    last = last->chain;
+	last->chain = bbt->chain;
 	bbt->chain = header;
 	return CAIRO_STATUS_SUCCESS;
     }
@@ -1431,7 +1434,7 @@ _cairo_recording_surface_snapshot (void *abstract_other)
     surface->extents = other->extents;
     surface->unbounded = other->unbounded;
 
-    surface->base.is_clear = TRUE;
+    surface->base.is_clear = other->base.is_clear;
 
     surface->bbtree.left = surface->bbtree.right = NULL;
     surface->bbtree.chain = INVALID_CHAIN;
@@ -1441,7 +1444,7 @@ _cairo_recording_surface_snapshot (void *abstract_other)
     surface->optimize_clears = TRUE;
 
     _cairo_array_init (&surface->commands, sizeof (cairo_command_t *));
-    status = _cairo_recording_surface_copy (other, surface);
+    status = _cairo_recording_surface_copy (surface, other);
     if (unlikely (status)) {
 	cairo_surface_destroy (&surface->base);
 	return _cairo_surface_create_in_error (status);
@@ -1536,12 +1539,12 @@ _cairo_recording_surface_get_path (cairo_surface_t    *abstract_surface,
 	    _cairo_traps_init (&traps);
 
 	    /* XXX call cairo_stroke_to_path() when that is implemented */
-	    status = _cairo_path_fixed_stroke_to_traps (&command->stroke.path,
-							&command->stroke.style,
-							&command->stroke.ctm,
-							&command->stroke.ctm_inverse,
-							command->stroke.tolerance,
-							&traps);
+	    status = _cairo_path_fixed_stroke_polygon_to_traps (&command->stroke.path,
+								&command->stroke.style,
+								&command->stroke.ctm,
+								&command->stroke.ctm_inverse,
+								command->stroke.tolerance,
+								&traps);
 
 	    if (status == CAIRO_INT_STATUS_SUCCESS)
 		status = _cairo_traps_path (&traps, path);

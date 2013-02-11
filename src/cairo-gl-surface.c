@@ -424,11 +424,12 @@ _cairo_gl_surface_create_scratch_for_texture (cairo_gl_context_t   *ctx,
     return &surface->base;
 }
 
-cairo_surface_t *
-_cairo_gl_surface_create_scratch (cairo_gl_context_t   *ctx,
-				  cairo_content_t	content,
-				  int			width,
-				  int			height)
+static cairo_surface_t *
+_create_scratch_internal (cairo_gl_context_t *ctx,
+			  cairo_content_t content,
+			  int width,
+			  int height,
+			  cairo_bool_t for_caching)
 {
     cairo_gl_surface_t *surface;
     GLenum format;
@@ -456,8 +457,13 @@ _cairo_gl_surface_create_scratch (cairo_gl_context_t   *ctx,
 	format = GL_RGBA;
 	break;
     case CAIRO_CONTENT_ALPHA:
-	/* We want to be trying GL_ALPHA framebuffer objects here. */
-	format = GL_RGBA;
+	/* When using GL_ALPHA, compositing doesn't work properly, but for
+	 * caching surfaces, we are just uploading pixel data, so it isn't
+	 * an issue. */
+	if (for_caching)
+	    format = GL_ALPHA;
+	else
+	    format = GL_RGBA;
 	break;
     case CAIRO_CONTENT_COLOR:
 	/* GL_RGB is almost what we want here -- sampling 1 alpha when
@@ -476,6 +482,24 @@ _cairo_gl_surface_create_scratch (cairo_gl_context_t   *ctx,
 		  format, GL_UNSIGNED_BYTE, NULL);
 
     return &surface->base;
+}
+
+cairo_surface_t *
+_cairo_gl_surface_create_scratch (cairo_gl_context_t   *ctx,
+				  cairo_content_t	content,
+				  int			width,
+				  int			height)
+{
+    return _create_scratch_internal (ctx, content, width, height, FALSE);
+}
+
+cairo_surface_t *
+_cairo_gl_surface_create_scratch_for_caching (cairo_gl_context_t *ctx,
+					      cairo_content_t content,
+					      int width,
+					      int height)
+{
+    return _create_scratch_internal (ctx, content, width, height, TRUE);
 }
 
 static cairo_status_t
@@ -508,7 +532,34 @@ _cairo_gl_surface_clear (cairo_gl_surface_t  *surface,
     glClearColor (r, g, b, a);
     glClear (GL_COLOR_BUFFER_BIT);
 
+    if (a == 0)
+	surface->base.is_clear = TRUE;
+
     return _cairo_gl_context_release (ctx, status);
+}
+
+static cairo_surface_t *
+_cairo_gl_surface_create_and_clear_scratch (cairo_gl_context_t *ctx,
+					    cairo_content_t content,
+					    int width,
+					    int height)
+{
+    cairo_gl_surface_t *surface;
+    cairo_int_status_t status;
+
+    surface = (cairo_gl_surface_t *)
+	_cairo_gl_surface_create_scratch (ctx, content, width, height);
+    if (unlikely (surface->base.status))
+	return &surface->base;
+
+    /* Cairo surfaces start out initialized to transparent (black) */
+    status = _cairo_gl_surface_clear (surface, CAIRO_COLOR_TRANSPARENT);
+    if (unlikely (status)) {
+	cairo_surface_destroy (&surface->base);
+	return _cairo_surface_create_in_error (status);
+    }
+
+    return &surface->base;
 }
 
 cairo_surface_t *
@@ -538,15 +589,12 @@ cairo_gl_surface_create (cairo_device_t		*abstract_device,
 	return _cairo_surface_create_in_error (status);
 
     surface = (cairo_gl_surface_t *)
-	_cairo_gl_surface_create_scratch (ctx, content, width, height);
+	_cairo_gl_surface_create_and_clear_scratch (ctx, content, width, height);
     if (unlikely (surface->base.status)) {
 	status = _cairo_gl_context_release (ctx, surface->base.status);
 	cairo_surface_destroy (&surface->base);
 	return _cairo_surface_create_in_error (status);
     }
-
-    /* Cairo surfaces start out initialized to transparent (black) */
-    status = _cairo_gl_surface_clear (surface, CAIRO_COLOR_TRANSPARENT);
 
     status = _cairo_gl_context_release (ctx, status);
     if (unlikely (status)) {
@@ -740,7 +788,7 @@ _cairo_gl_surface_create_similar (void		 *abstract_surface,
     if (unlikely (status))
 	return _cairo_surface_create_in_error (status);
 
-    surface = _cairo_gl_surface_create_scratch (ctx, content, width, height);
+    surface = _cairo_gl_surface_create_and_clear_scratch (ctx, content, width, height);
 
     status = _cairo_gl_context_release (ctx, status);
     if (unlikely (status)) {
@@ -774,7 +822,7 @@ _cairo_gl_surface_fill_alpha_channel (cairo_gl_surface_t *dst,
     if (unlikely (status))
         goto CLEANUP;
 
-    _cairo_gl_composite_emit_rect (ctx, x, y, x + width, y + height, 0);
+    _cairo_gl_context_emit_rect (ctx, x, y, x + width, y + height);
 
     status = _cairo_gl_context_release (ctx, status);
 
@@ -792,7 +840,8 @@ _cairo_gl_surface_draw_image (cairo_gl_surface_t *dst,
 			      cairo_image_surface_t *src,
 			      int src_x, int src_y,
 			      int width, int height,
-			      int dst_x, int dst_y)
+			      int dst_x, int dst_y,
+			      cairo_bool_t force_flush)
 {
     GLenum internal_format, format, type;
     cairo_bool_t has_alpha, needs_swap;
@@ -834,9 +883,11 @@ _cairo_gl_surface_draw_image (cairo_gl_surface_t *dst,
 
     cpp = PIXMAN_FORMAT_BPP (src->pixman_format) / 8;
 
-    status = _cairo_gl_surface_flush (&dst->base, 0);
-    if (unlikely (status))
-	goto FAIL;
+    if (force_flush) {
+	status = _cairo_gl_surface_flush (&dst->base, 0);
+	if (unlikely (status))
+	    goto FAIL;
+    }
 
     if (_cairo_gl_surface_is_texture (dst)) {
 	void *data_start = src->data + src_y * src->stride + src_x * cpp;
@@ -903,7 +954,7 @@ _cairo_gl_surface_draw_image (cairo_gl_surface_t *dst,
                                                src,
                                                src_x, src_y,
                                                width, height,
-                                               0, 0);
+                                               0, 0, force_flush);
         if (status == CAIRO_INT_STATUS_SUCCESS) {
             cairo_surface_pattern_t tmp_pattern;
 	    cairo_rectangle_int_t r;
@@ -999,6 +1050,11 @@ _cairo_gl_surface_map_to_image (void      *abstract_surface,
     cairo_status_t status;
     int y;
 
+    status = _cairo_gl_context_acquire (surface->base.device, &ctx);
+    if (unlikely (status)) {
+	return _cairo_image_surface_create_in_error (status);
+    }
+
     /* Want to use a switch statement here but the compiler gets whiny. */
     if (surface->base.content == CAIRO_CONTENT_COLOR_ALPHA) {
 	format = GL_BGRA;
@@ -1020,25 +1076,26 @@ _cairo_gl_surface_map_to_image (void      *abstract_surface,
 	return NULL;
     }
 
-    /*
-     * GLES2 supports only RGBA, UNSIGNED_BYTE so use that.
-     * We are also using this format for ALPHA as GLES2 does not
-     * support GL_PACK_ROW_LENGTH anyway, and this makes sure that the
-     * pixman image that is created has row_stride = row_width * bpp.
-     */
     if (_cairo_gl_surface_flavor (surface) == CAIRO_GL_FLAVOR_ES) {
-	format = GL_RGBA;
-	if (! _cairo_is_little_endian ()) {
-	    if (surface->base.content == CAIRO_CONTENT_COLOR)
-		pixman_format = PIXMAN_r8g8b8x8;
-	    else
-		pixman_format = PIXMAN_r8g8b8a8;
-	} else {
-	    if (surface->base.content == CAIRO_CONTENT_COLOR)
-		pixman_format = PIXMAN_x8b8g8r8;
-	    else
-		pixman_format = PIXMAN_a8b8g8r8;
+	/* If only RGBA is supported, we must download data in a compatible
+	 * format. This means that pixman will convert the data on the CPU when
+	 * interacting with other image surfaces. For ALPHA, GLES2 does not
+	 * support GL_PACK_ROW_LENGTH anyway, and this makes sure that the
+	 * pixman image that is created has row_stride = row_width * bpp. */
+	if (surface->base.content == CAIRO_CONTENT_ALPHA || !ctx->can_read_bgra) {
+	    cairo_bool_t little_endian = _cairo_is_little_endian ();
+	    format = GL_RGBA;
+
+	    if (surface->base.content == CAIRO_CONTENT_COLOR) {
+		pixman_format = little_endian ?
+		    PIXMAN_x8b8g8r8 : PIXMAN_r8g8b8x8;
+	    } else {
+		pixman_format = little_endian ?
+		    PIXMAN_a8b8g8r8 : PIXMAN_r8g8b8a8;
+	    }
 	}
+
+	/* GLES2 only supports GL_UNSIGNED_BYTE. */
 	type = GL_UNSIGNED_BYTE;
 	cpp = 4;
     }
@@ -1049,19 +1106,19 @@ _cairo_gl_surface_map_to_image (void      *abstract_surface,
 							extents->width,
 							extents->height,
 							-1);
-    if (unlikely (image->base.status))
+    if (unlikely (image->base.status)) {
+	status = _cairo_gl_context_release (ctx, status);
 	return image;
-
-    if (surface->base.serial == 0)
-	return image;
-
-    status = _cairo_gl_context_acquire (surface->base.device, &ctx);
-    if (unlikely (status)) {
-	cairo_surface_destroy (&image->base);
-	return _cairo_image_surface_create_in_error (status);
     }
 
     cairo_surface_set_device_offset (&image->base, -extents->x, -extents->y);
+
+    /* If the original surface has not been modified or
+     * is clear, we can avoid downloading data. */
+    if (surface->base.is_clear || surface->base.serial == 0) {
+	status = _cairo_gl_context_release (ctx, status);
+	return image;
+    }
 
     /* This is inefficient, as we'd rather just read the thing without making
      * it the destination.  But then, this is the fallback path, so let's not
@@ -1177,7 +1234,8 @@ _cairo_gl_surface_unmap_image (void		      *abstract_surface,
 					   0, 0,
 					   image->width, image->height,
 					   image->base.device_transform_inverse.x0,
-					   image->base.device_transform_inverse.y0);
+					   image->base.device_transform_inverse.y0,
+					   TRUE);
 
     cairo_surface_finish (&image->base);
     cairo_surface_destroy (&image->base);
