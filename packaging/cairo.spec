@@ -159,7 +159,7 @@ make %{?_smp_mflags} V=1
 
 %files -n libcairo
 %defattr(-, root, root)
-%doc COPYING COPYING-LGPL-2.1 COPYING-MPL-1.1
+%license COPYING COPYING-LGPL-2.1 COPYING-MPL-1.1
 %{_libdir}/libcairo.so.*
 
 %files -n libcairo-gobject
