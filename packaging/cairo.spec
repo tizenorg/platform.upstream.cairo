@@ -168,12 +168,12 @@ make %{?_smp_mflags} V=1
 
 %files -n libcairo-script-interpreter
 %defattr(-, root, root)
-%doc util/cairo-script/COPYING
+%license util/cairo-script/COPYING
 %{_libdir}/libcairo-script-interpreter.so.*
 
 %files tools
 %defattr(-, root, root)
-%doc util/cairo-trace/COPYING util/cairo-trace/COPYING-GPL-3
+%license util/cairo-trace/COPYING util/cairo-trace/COPYING-GPL-3
 %{_bindir}/cairo-sphinx
 %{_bindir}/cairo-trace
 %dir %{_libdir}/cairo
