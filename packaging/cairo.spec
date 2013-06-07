@@ -1,6 +1,6 @@
 %define build_xcb_backend 0
 %define build_gl_backend 1
-%bcond_without wayland
+%bcond_with wayland
 
 
 Name:           cairo
