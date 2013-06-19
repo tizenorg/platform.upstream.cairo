@@ -1,5 +1,5 @@
-%define build_xcb_backend 0
-%define build_gl_backend 1
+%bcond_without cairo_xcb_backend 
+%bcond_without cairo_gl_backend
 %bcond_with wayland
 
 
@@ -16,24 +16,25 @@ BuildRequires:  libtool
 BuildRequires:  pkg-config
 BuildRequires:  xz
 BuildRequires:  pkgconfig(fontconfig)
+BuildRequires:  pkgconfig(xext)
 BuildRequires:  pkgconfig(freetype2)
 BuildRequires:  pkgconfig(gobject-2.0)
 BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(pixman-1)
 BuildRequires:  pkgconfig(x11)
 BuildRequires:  which
-%if %build_xcb_backend
+%if %{with cairo_xcb_backend}
 BuildRequires:  pkgconfig(xcb)
 BuildRequires:  pkgconfig(xcb-shm)
 %endif
-%if %build_gl_backend
-BuildRequires:  mesa-devel
+%if %{with cairo_gl_backend}
+#BuildRequires:  mesa-devel
+BuildRequires:  pvr-bin-mdfld
 %if %{with wayland}
 BuildRequires:	pkgconfig(wayland-egl)
 %endif
 %endif
 BuildRequires:  pkgconfig(xrender)
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
 %description
 Cairo is a vector graphics library with cross-device output support.
@@ -126,15 +127,19 @@ NOCONFIGURE=1 ./autogen.sh
     --with-pic \
     --enable-fc \
     --enable-ft \
-%if %build_gl_backend
-    --enable-gl --enable-egl \
+%if %{with cairo_gl_backend}
+    --enable-gl  \
+    --enable-egl \
+%ifnarch %ix86
+    --enable-glesv2=yes \
+%endif
 %endif
     --enable-ps \
     --enable-pdf \
     --enable-script \
     --enable-svg \
     --enable-tee \
-%if %build_xcb_backend
+%if %{with cairo_xcb_backend}
     --enable-xcb \
 %endif
     --enable-xlib \

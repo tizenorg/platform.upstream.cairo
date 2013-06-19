@@ -1,3 +1,6 @@
+* Wed Jun 19 2013 Anas Nashif <anas.nashif@intel.com> accepted/tizen/20130608.044146@f7aee60
+- make gl backend support conditional
+
 * Fri Jun 07 2013 Anas Nashif <anas.nashif@intel.com> accepted/tizen/20130520.095138@a4edfc8
 - do not build wayland by default, use config option from project
 
