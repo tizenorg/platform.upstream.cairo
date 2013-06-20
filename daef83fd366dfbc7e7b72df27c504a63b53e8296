@@ -1,0 +1,10 @@
+Change-Id: Idaef83fd366dfbc7e7b72df27c504a63b53e8296
+Code-Review+1: Anas Nashif <anas.nashif@intel.com>
+Verified+1: Anas Nashif <anas.nashif@intel.com>
+Code-Review+2: Rusty Lynch <rusty.lynch@intel.com>
+Verified+1: Rusty Lynch <rusty.lynch@intel.com>
+Submitted-by: Rusty Lynch <rusty.lynch@intel.com>
+Submitted-at: Thu, 20 Jun 2013 08:36:29 -0700
+Reviewed-on: https://review.tizen.org/gerrit/4159
+Project: platform/upstream/cairo
+Branch: refs/heads/tizen
