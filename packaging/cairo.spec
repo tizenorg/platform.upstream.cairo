@@ -12,6 +12,7 @@ Url:            http://cairographics.org/
 Group:          Graphics/Libraries
 Source:         http://cairographics.org/releases/%{name}-%{version}.tar.xz
 Source99:       baselibs.conf
+Source1001: 	cairo.manifest
 BuildRequires:  libtool
 BuildRequires:  pkg-config
 BuildRequires:  xz
@@ -113,6 +114,7 @@ cairo.
 
 %prep
 %setup -q
+cp %{SOURCE1001} .
 
 %build
 # Disable Atom optimizations in order to make binaries executable in buildroot
@@ -162,20 +164,24 @@ make %{?_smp_mflags} V=1
 %postun -n libcairo-script-interpreter -p /sbin/ldconfig
 
 %files -n libcairo
+%manifest %{name}.manifest
 %defattr(-, root, root)
 %license COPYING COPYING-LGPL-2.1 COPYING-MPL-1.1
 %{_libdir}/libcairo.so.*
 
 %files -n libcairo-gobject
+%manifest %{name}.manifest
 %defattr(-, root, root)
 %{_libdir}/libcairo-gobject.so.2*
 
 %files -n libcairo-script-interpreter
+%manifest %{name}.manifest
 %defattr(-, root, root)
 %license util/cairo-script/COPYING
 %{_libdir}/libcairo-script-interpreter.so.*
 
 %files tools
+%manifest %{name}.manifest
 %defattr(-, root, root)
 %license util/cairo-trace/COPYING util/cairo-trace/COPYING-GPL-3
 %{_bindir}/cairo-sphinx
@@ -186,6 +192,7 @@ make %{?_smp_mflags} V=1
 %{_libdir}/cairo/libcairo-trace.so
 
 %files devel
+%manifest %{name}.manifest
 %defattr(-, root, root)
 %doc PORTING_GUIDE
 %{_includedir}/cairo/
