@@ -1,0 +1,8 @@
+Change-Id: I0f7900770c6a11532c1c0e3674c2bc543dfbe735
+Code-Review+2: Ryan Ware <ware@linux.intel.com>
+Verified+1: Ryan Ware <ware@linux.intel.com>
+Submitted-by: Ryan Ware <ware@linux.intel.com>
+Submitted-at: Mon, 08 Jul 2013 10:05:59 -0700
+Reviewed-on: https://review.tizen.org/gerrit/4629
+Project: platform/upstream/cairo
+Branch: refs/heads/tizen
