@@ -9,7 +9,7 @@ Release:        0
 License:        LGPL-2.1+ or MPL-1.1
 Summary:        Vector Graphics Library with Cross-Device Output Support
 Url:            http://cairographics.org/
-Group:          Graphics/Libraries
+Group:          Graphics & UI Framework/Libraries
 Source:         http://cairographics.org/releases/%{name}-%{version}.tar.xz
 Source99:       baselibs.conf
 Source1001: 	cairo.manifest
@@ -30,6 +30,7 @@ BuildRequires:  pkgconfig(xcb-shm)
 %endif
 %if %{with cairo_gl_backend}
 BuildRequires:  mesa-devel
+BuildRequires:  pkgconfig(glesv2)
 %if %{with wayland}
 BuildRequires:	pkgconfig(wayland-egl)
 %endif
@@ -46,7 +47,7 @@ hardware acceleration when available.
 %package -n libcairo
 License:        LGPL-2.1+ or MPL-1.1
 Summary:        Vector Graphics Library with Cross-Device Output Support
-Group:          Graphics/Libraries
+Group:          Graphics & UI Framework/Libraries
 Provides:       cairo = %{version}
 Obsoletes:      cairo < %{version}
 
@@ -60,7 +61,7 @@ hardware acceleration when available.
 %package -n libcairo-gobject
 License:        LGPL-2.1+ or MPL-1.1
 Summary:        Vector Graphics Library with Cross-Device Output Support
-Group:          Graphics/Libraries
+Group:          Graphics & UI Framework/Libraries
 
 %description -n libcairo-gobject
 Cairo is a vector graphics library with cross-device output support.
@@ -75,7 +76,7 @@ meant to support gobject-introspection binding creation.
 %package -n libcairo-script-interpreter
 License:        LGPL-2.1+ or MPL-1.1
 Summary:        Vector Graphics Library with Cross-Device Output Support
-Group:          Graphics/Libraries
+Group:          Graphics & UI Framework/Libraries
 
 %description -n libcairo-script-interpreter
 Cairo is a vector graphics library with cross-device output support.
@@ -87,7 +88,7 @@ hardware acceleration when available.
 %package tools
 License:        GPL-3.0+
 Summary:        Vector Graphics Library with Cross-Device Output Support -- Utilities
-Group:          Development/Libraries
+Group:          Graphics & UI Framework/Development
 # We need an explicit requires since nothing links to the cairo library
 Requires:       libcairo = %{version}
 
@@ -103,7 +104,7 @@ This package contains various cairo utilities.
 %package devel
 License:        LGPL-2.1+ or MPL-1.1
 Summary:        Development environment for cairo
-Group:          Development/Libraries
+Group:          Graphics & UI Framework/Development
 Requires:       libcairo = %{version}
 Requires:       libcairo-gobject = %{version}
 Requires:       libcairo-script-interpreter = %{version}
@@ -129,11 +130,8 @@ NOCONFIGURE=1 ./autogen.sh
     --enable-fc \
     --enable-ft \
 %if %{with cairo_gl_backend}
-    --enable-gl  \
     --enable-egl \
-%ifnarch %ix86 x86_64
     --enable-glesv2=yes \
-%endif
 %endif
     --enable-ps \
     --enable-pdf \

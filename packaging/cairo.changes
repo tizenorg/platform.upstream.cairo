@@ -1,3 +1,6 @@
+* Wed Aug 21 2013 Rusty Lynch <rusty.lynch@intel.com> accepted/tizen/20130710.221023@2ad3118
+- Enable glesv2
+
 * Wed Jun 19 2013 Anas Nashif <anas.nashif@intel.com> accepted/tizen/20130608.044146@f7aee60
 - make gl backend support conditional
 
