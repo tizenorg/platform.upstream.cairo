@@ -630,7 +630,7 @@ query_surface_capabilities (cairo_gl_surface_t *surface)
     glGetIntegerv(GL_SAMPLES, &samples);
     glGetIntegerv(GL_STENCIL_BITS, &stencil_bits);
     surface->supports_stencil = stencil_bits > 0;
-    surface->supports_msaa = samples > 1;
+    surface->supports_msaa = 1;
 
     status = _cairo_gl_context_release (ctx, status);
 }
