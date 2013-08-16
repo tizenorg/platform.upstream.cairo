@@ -605,7 +605,7 @@ _prevent_overlapping_strokes (cairo_gl_context_t 		*ctx,
 static void
 query_surface_capabilities (cairo_gl_surface_t *surface)
 {
-    GLint samples, stencil_bits;
+    GLint stencil_bits;
     cairo_gl_context_t *ctx;
     cairo_int_status_t status;
 
@@ -627,10 +627,9 @@ query_surface_capabilities (cairo_gl_surface_t *surface)
 
     _cairo_gl_context_set_destination (ctx, surface, FALSE);
 
-    glGetIntegerv(GL_SAMPLES, &samples);
     glGetIntegerv(GL_STENCIL_BITS, &stencil_bits);
     surface->supports_stencil = stencil_bits > 0;
-    surface->supports_msaa = samples > 1;
+    surface->supports_msaa = TRUE;
 
     status = _cairo_gl_context_release (ctx, status);
 }
