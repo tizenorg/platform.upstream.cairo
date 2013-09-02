@@ -29,7 +29,7 @@ BuildRequires:  pkgconfig(xcb)
 BuildRequires:  pkgconfig(xcb-shm)
 %endif
 %if %{with cairo_gl_backend}
-BuildRequires:  mesa-devel
+BuildRequires:  pkgconfig(gl)
 %if %{with wayland}
 BuildRequires:	pkgconfig(wayland-egl)
 %endif
