@@ -30,6 +30,7 @@ BuildRequires:  pkgconfig(xcb-shm)
 %endif
 %if %{with cairo_gl_backend}
 BuildRequires:  pkgconfig(gl)
+BuildRequires:  pkgconfig(glesv2)
 %if %{with wayland}
 BuildRequires:	pkgconfig(wayland-egl)
 %endif
@@ -129,11 +130,8 @@ NOCONFIGURE=1 ./autogen.sh
     --enable-fc \
     --enable-ft \
 %if %{with cairo_gl_backend}
-    --enable-gl  \
     --enable-egl \
-%ifnarch %ix86 x86_64
     --enable-glesv2=yes \
-%endif
 %endif
     --enable-ps \
     --enable-pdf \
