@@ -1,3 +1,28 @@
+* Fri Nov 22 2013 Zhigang Gong <zhigang.gong@intel.com> upstream/1.12.16@f3854fa
+- Updated to 1.12.16.
+- Don't compute vertex transformation on GPU side.
+- Enable GLES
+- avoid hard coded dependencies
+- resetting manifest requested domain to floor
+- make gl backend support conditional
+- do not build wayland by default, use config option from project
+- fixed license for sub-packages
+- Set license using %license
+- Update to 1.12.14
+- Update to 1.12.14
+- Update to 1.12.14
+- packaging: Disable atom optimizations
+- actually use bcond_without to enable wayland by default
+- add changelog
+- use bcond_with wayland
+- remove dependency on gtk-doc
+- do not require gtk-doc for building
+- build require which
+- apply patches and fixed requirements
+- no version
+- add packaging
+- Imported Upstream version 1.12.16
+
 * Wed Jun 19 2013 Anas Nashif <anas.nashif@intel.com> accepted/tizen/20130608.044146@f7aee60
 - make gl backend support conditional
 
