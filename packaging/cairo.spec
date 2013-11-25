@@ -17,25 +17,26 @@ BuildRequires:  libtool
 BuildRequires:  pkg-config
 BuildRequires:  xz
 BuildRequires:  pkgconfig(fontconfig)
-BuildRequires:  pkgconfig(xext)
 BuildRequires:  pkgconfig(freetype2)
 BuildRequires:  pkgconfig(gobject-2.0)
 BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(pixman-1)
-BuildRequires:  pkgconfig(x11)
 BuildRequires:  which
-%if %{with cairo_xcb_backend}
-BuildRequires:  pkgconfig(xcb)
-BuildRequires:  pkgconfig(xcb-shm)
-%endif
 %if %{with cairo_gl_backend}
 BuildRequires:  pkgconfig(gl)
 BuildRequires:  pkgconfig(glesv2)
 %if %{with wayland}
 BuildRequires:	pkgconfig(wayland-egl)
-%endif
-%endif
+%else
+BuildRequires:  pkgconfig(xext)
+BuildRequires:  pkgconfig(x11)
 BuildRequires:  pkgconfig(xrender)
+%if %{with cairo_xcb_backend}
+BuildRequires:  pkgconfig(xcb)
+BuildRequires:  pkgconfig(xcb-shm)
+%endif
+%endif
+%endif
 
 %description
 Cairo is a vector graphics library with cross-device output support.
@@ -141,7 +142,12 @@ NOCONFIGURE=1 ./autogen.sh
 %if %{with cairo_xcb_backend}
     --enable-xcb \
 %endif
+%if %{with wayland}
+   --disable-xlib \
+   --disable-xcb  \
+%else
     --enable-xlib \
+%endif
     --disable-gtk-doc \
     --disable-static
 make %{?_smp_mflags} V=1
