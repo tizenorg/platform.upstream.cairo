@@ -27,6 +27,9 @@ BuildRequires:  pkgconfig(gl)
 BuildRequires:  pkgconfig(glesv2)
 %if %{with wayland}
 BuildRequires:	pkgconfig(wayland-egl)
+%endif
+%endif
+%if %{with wayland}
 %else
 BuildRequires:  pkgconfig(xext)
 BuildRequires:  pkgconfig(x11)
@@ -36,7 +39,7 @@ BuildRequires:  pkgconfig(xcb)
 BuildRequires:  pkgconfig(xcb-shm)
 %endif
 %endif
-%endif
+
 
 %description
 Cairo is a vector graphics library with cross-device output support.
