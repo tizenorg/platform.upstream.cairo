@@ -1,6 +1,7 @@
 %bcond_without cairo_xcb_backend 
 %bcond_without cairo_gl_backend
 %bcond_with wayland
+%bcond_without x
 
 
 Name:           cairo
@@ -29,7 +30,7 @@ BuildRequires:  pkgconfig(glesv2)
 BuildRequires:	pkgconfig(wayland-egl)
 %endif
 %endif
-%if %{with wayland}
+%if %{without x}
 %else
 BuildRequires:  pkgconfig(xext)
 BuildRequires:  pkgconfig(x11)
@@ -142,7 +143,7 @@ NOCONFIGURE=1 ./autogen.sh
     --enable-script \
     --enable-svg \
     --enable-tee \
-%if %{with wayland}
+%if %{without x}
    --disable-xlib \
    --disable-xcb  \
 %else
