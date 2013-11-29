@@ -24,14 +24,15 @@ BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(pixman-1)
 BuildRequires:  which
 %if %{with cairo_gl_backend}
+%if !%{without x}
 BuildRequires:  pkgconfig(gl)
+%endif
 BuildRequires:  pkgconfig(glesv2)
 %if %{with wayland}
 BuildRequires:	pkgconfig(wayland-egl)
 %endif
 %endif
-%if %{without x}
-%else
+%if !%{without x}
 BuildRequires:  pkgconfig(xext)
 BuildRequires:  pkgconfig(x11)
 BuildRequires:  pkgconfig(xrender)
