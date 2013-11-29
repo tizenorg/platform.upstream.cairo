@@ -24,7 +24,10 @@ BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(pixman-1)
 BuildRequires:  which
 %if %{with cairo_gl_backend}
+%if %{without x}
+%else
 BuildRequires:  pkgconfig(gl)
+%endif
 BuildRequires:  pkgconfig(glesv2)
 %if %{with wayland}
 BuildRequires:	pkgconfig(wayland-egl)
