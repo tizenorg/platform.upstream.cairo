@@ -1,7 +1,7 @@
 %bcond_without cairo_xcb_backend 
 %bcond_without cairo_gl_backend
 %bcond_with wayland
-%bcond_without x
+%bcond_with x
 
 
 Name:           cairo
@@ -24,7 +24,7 @@ BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(pixman-1)
 BuildRequires:  which
 %if %{with cairo_gl_backend}
-%if !%{without x}
+%if %{with x}
 BuildRequires:  pkgconfig(gl)
 %endif
 BuildRequires:  pkgconfig(glesv2)
@@ -32,7 +32,7 @@ BuildRequires:  pkgconfig(glesv2)
 BuildRequires:	pkgconfig(wayland-egl)
 %endif
 %endif
-%if !%{without x}
+%if %{with x}
 BuildRequires:  pkgconfig(xext)
 BuildRequires:  pkgconfig(x11)
 BuildRequires:  pkgconfig(xrender)
@@ -144,7 +144,7 @@ NOCONFIGURE=1 ./autogen.sh
     --enable-script \
     --enable-svg \
     --enable-tee \
-%if %{without x}
+%if %{with wayland} && !%{with x}
    --disable-xlib \
    --disable-xcb  \
 %else
