@@ -2,6 +2,7 @@
 %bcond_without cairo_gl_backend
 %bcond_with wayland
 %bcond_with x
+%bcond_with desktop
 
 
 Name:           cairo
@@ -24,7 +25,7 @@ BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(pixman-1)
 BuildRequires:  which
 %if %{with cairo_gl_backend}
-%if %{with x}
+%if %{with x} && %{with desktop}
 BuildRequires:  pkgconfig(gl)
 %endif
 BuildRequires:  pkgconfig(glesv2)
