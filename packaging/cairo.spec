@@ -1,4 +1,5 @@
 %bcond_without cairo_xcb_backend 
+%bcond_without cairo_gl_backend
 %bcond_with wayland
 %bcond_with x
 %bcond_with desktop
@@ -23,12 +24,14 @@ BuildRequires:  pkgconfig(gobject-2.0)
 BuildRequires:  pkgconfig(libpng)
 BuildRequires:  pkgconfig(pixman-1)
 BuildRequires:  which
+%if %{with cairo_gl_backend}
 %if %{with x} && %{with desktop}
 BuildRequires:  pkgconfig(gl)
 %endif
 BuildRequires:  pkgconfig(glesv2)
 %if %{with wayland}
 BuildRequires:	pkgconfig(wayland-egl)
+%endif
 %endif
 %if %{with x}
 BuildRequires:  pkgconfig(xext)
@@ -133,8 +136,10 @@ NOCONFIGURE=1 ./autogen.sh
     --with-pic \
     --enable-fc \
     --enable-ft \
+%if %{with cairo_gl_backend}
     --enable-egl \
     --enable-glesv2=yes \
+%endif
     --enable-ps \
     --enable-pdf \
     --enable-script \
