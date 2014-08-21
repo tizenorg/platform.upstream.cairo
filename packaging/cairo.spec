@@ -129,6 +129,10 @@ cp %{SOURCE1001} .
 export RPM_OPT_FLAGS=`echo $RPM_OPT_FLAGS | sed s'/atom/i686/g'`
 export CFLAGS=`echo $CFLAGS | sed s'/atom/i686/g'`
 export CXXFLAGS=`echo $CXXFLAGS | sed s'/atom/i686/g'`
+%ifarch aarch64
+export CFLAGS="$CFLAGS -fno-lto"
+export CXXFLAGS="$CXXFLAGS -fno-lto"
+%endif
 
 # Needed by patch0
 NOCONFIGURE=1 ./autogen.sh
